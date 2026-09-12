@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="PlistEditor.Desktop/PlistEditor.Desktop.csproj" />
+  <Project Path="PlistEditor/PlistEditor.csproj" />
+</Solution>

@@ -1,0 +1,90 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:PlistEditor.ViewModels"
+             xmlns:ic="using:FluentIcons.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="50"
+             x:Class="PlistEditor.Views.PlistItemControl"
+             x:DataType="vm:PlistItemViewModel">
+
+    <Design.DataContext>
+        <vm:PlistItemViewModel Key="SampleItem"
+                               Type="Boolean" 
+                               Value="AQAAAA=="/>
+    </Design.DataContext>
+
+    <Grid ColumnDefinitions="160,110,*,Auto" Margin="0,2">
+        <!-- Column 0: Key Name -->
+        <!-- Read-Only Key Label -->
+        <TextBlock Grid.Column="0" 
+                   Text="{Binding Key}" 
+                   FontWeight="SemiBold" 
+                   VerticalAlignment="Center"
+                   IsVisible="{Binding !IsEditing}"
+                   Margin="19,0"/>
+
+        <!-- Editable Key Input -->
+        <TextBox Grid.Column="0" 
+                 Text="{Binding Key}" 
+                 FontWeight="SemiBold" 
+                 IsVisible="{Binding IsEditing}"
+                 Margin="8,0"
+                 VerticalContentAlignment="Center"
+                 VerticalAlignment="Center"/>
+
+        <!-- Column 1: Type -->
+        <!-- Read-Only Type Label -->
+        <TextBlock Grid.Column="1" 
+                   Text="{Binding Type}" 
+                   Foreground="Gray"
+                   VerticalAlignment="Center"
+                   IsVisible="{Binding !IsEditing}"
+                   Margin="12,-2,8,0"/>
+
+        <!-- Editable Type ComboBox -->
+        <ComboBox Grid.Column="1" 
+                  ItemsSource="{Binding AvailableTypes}" 
+                  SelectedItem="{Binding Type}" 
+                  IsVisible="{Binding IsEditing}"
+                  VerticalAlignment="Center"
+                  Margin="0,0,8,0"/>
+
+        <!-- Column 2: Value Inputs -->
+        <!-- String / Integer -->
+        <TextBox Grid.Column="2" 
+                 Text="{Binding Value}" 
+                 VerticalAlignment="Center"
+                 IsVisible="{Binding IsStringOrInt}"/>
+
+        <!-- Boolean -->
+        <CheckBox Grid.Column="2" 
+                  IsChecked="{Binding ValueAsBool, Mode=TwoWay}" 
+                  IsVisible="{Binding IsBoolean}" 
+                  HorizontalAlignment="Center"/>
+
+        <!-- Data (Hex Display) -->
+        <TextBox Grid.Column="2" 
+                 Text="{Binding ValueAsHex, Mode=TwoWay}" 
+                 IsVisible="{Binding IsData}"
+                 VerticalAlignment="Center"
+                 FontFamily="Courier New"/>
+
+        <!-- Column 3: Action Buttons -->
+        <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="4" Margin="8,0">
+            <!-- Edit Toggle Button -->
+            <Button Command="{Binding ToggleEditCommand}">
+                <Grid>
+                    <ic:SymbolIcon Symbol="Edit" IsVisible="{Binding !IsEditing}"/>
+                    <ic:SymbolIcon Symbol="Checkmark" IsVisible="{Binding IsEditing}"/>
+                </Grid>
+            </Button>
+            <Button Command="{Binding AddChildCommand}">
+                <ic:SymbolIcon Symbol="AddSquare"/>
+            </Button>
+            <Button Command="{Binding DeleteCommand}" >
+                <ic:SymbolIcon Symbol="Delete"/>
+            </Button>
+        </StackPanel>
+    </Grid>
+</UserControl>
