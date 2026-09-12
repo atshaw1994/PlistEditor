@@ -51,7 +51,7 @@ public partial class MainViewModel : ViewModelBase
 
                     if (!keyName.StartsWith('#'))
                     {
-                        FirstLevel.Add(PlistSectionViewModel.Create(keyName, valueElement));
+                        FirstLevel.Add(PlistSectionViewModel.Create(keyName, valueElement, FirstLevel));
                     }
                 }
             }
@@ -143,7 +143,8 @@ public partial class MainViewModel : ViewModelBase
 
                 if (!keyName.StartsWith('#'))
                 {
-                    FirstLevel.Add(PlistSectionViewModel.Create(keyName, valueElement));
+                    var section = PlistSectionViewModel.Create(keyName, valueElement, FirstLevel);
+                    FirstLevel.Add(section);
                 }
             }
         }

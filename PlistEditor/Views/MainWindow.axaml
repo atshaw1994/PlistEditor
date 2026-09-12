@@ -17,7 +17,72 @@
     <Window.Resources>
         <!-- Tab Header Template -->
         <DataTemplate x:Key="TabHeaderTemplate" x:DataType="vm:PlistSectionViewModel">
-            <TextBlock Text="{Binding Name}" FontWeight="Bold" Padding="8,4"/>
+            <Grid ColumnDefinitions="*,Auto" 
+                  HorizontalAlignment="Stretch" 
+                  Background="Transparent"
+                  Classes.editing="{Binding IsEditing}">
+                <Grid.Styles>
+                    <Style Selector="StackPanel.header-actions">
+                        <Setter Property="Opacity" Value="0" />
+                    </Style>
+
+                    <!-- Show buttons on hover ONLY IF NOT in editing mode -->
+                    <Style Selector="TabItem:pointerover Grid:not(.editing) StackPanel.header-actions">
+                        <Setter Property="Opacity" Value="1" />
+                    </Style>
+                </Grid.Styles>
+
+                <!-- Read-Only Title -->
+                <TextBlock Grid.Column="0" 
+                           Text="{Binding Name}" 
+                           FontWeight="Bold" 
+                           VerticalAlignment="Center" 
+                           HorizontalAlignment="Left"
+                           IsVisible="{Binding !IsEditing}"/>
+
+                <!-- Editable Title Input -->
+                <TextBox Grid.Column="0"
+                         Text="{Binding Name}"
+                         VerticalAlignment="Center"
+                         HorizontalAlignment="Stretch"
+                         IsVisible="{Binding IsEditing}"
+                         FontSize="11"
+                         Height="24"
+                         Margin="0,0,-24,0"/>
+
+                <!-- Action Buttons -->
+                <StackPanel Classes="header-actions"
+                            Grid.Column="1" 
+                            Margin="8,0,0,0" 
+                            Orientation="Horizontal" 
+                            Spacing="4" 
+                            VerticalAlignment="Center">
+                    <StackPanel.Transitions>
+                        <Transitions>
+                            <DoubleTransition Property="Opacity" Duration="0:0:0.15"/>
+                        </Transitions>
+                    </StackPanel.Transitions>
+
+                    <!-- Rename Toggle -->
+                    <Button Command="{Binding ToggleEditCommand}" ToolTip.Tip="Rename Dictionary">
+                        <ic:SymbolIcon Symbol="Edit" FontSize="10"/>
+                    </Button>
+
+                    <!-- Delete Dictionary -->
+                    <Button Command="{Binding DeleteCommand}" Foreground="Crimson" ToolTip.Tip="Delete Dictionary">
+                        <ic:SymbolIcon Symbol="Dismiss" FontSize="10"/>
+                    </Button>
+                </StackPanel>
+
+                <!-- Save Rename -->
+                <Button Grid.Column="1" 
+                        IsVisible="{Binding IsEditing}" 
+                        Command="{Binding ToggleEditCommand}" 
+                        HorizontalAlignment="Right"
+                        ToolTip.Tip="Save Edits">
+                    <ic:SymbolIcon Symbol="Checkmark" FontSize="10"/>
+                </Button>
+            </Grid>
         </DataTemplate>
 
         <!-- Main Recursive Content Template -->
@@ -45,7 +110,18 @@
                             ItemTemplate="{StaticResource TabHeaderTemplate}"
                             ContentTemplate="{StaticResource RecursiveTabTemplate}" 
                             DockPanel.Dock="Top"
-                            TabStripPlacement="Left"/>
+                            TabStripPlacement="Left">
+                        <TabControl.Styles>
+                            <Style Selector="TabItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            </Style>
+
+                            <!-- Reveal buttons when hovering over the TabItem -->
+                            <Style Selector="TabItem:pointerover StackPanel#HeaderActions">
+                                <Setter Property="Opacity" Value="1" />
+                            </Style>
+                        </TabControl.Styles>
+                </TabControl>
 
                 <!-- TreeView for leaf items & array elements -->
                 <TreeView ItemsSource="{Binding Items}" 
@@ -91,6 +167,16 @@
                     ContentTemplate="{StaticResource RecursiveTabTemplate}" 
                     HorizontalAlignment="Stretch"
                     HorizontalContentAlignment="Stretch"
-                    TabStripPlacement="Left"/>
+                    TabStripPlacement="Left">
+            <TabControl.Styles>
+                <Style Selector="TabItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    <Setter Property="MaxHeight" Value="36" />
+                </Style>
+                <Style Selector="TabItem /template/ ContentPresenter#PART_ContentPresenter">
+                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                </Style>
+            </TabControl.Styles>
+        </TabControl>
     </DockPanel>
 </Window>

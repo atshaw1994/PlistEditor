@@ -8,12 +8,16 @@ namespace PlistEditor.ViewModels;
 
 public partial class PlistSectionViewModel : ObservableObject
 {
-    public string Name { get; set; } = string.Empty;
+    [ObservableProperty] public partial string Name { get; set; } = string.Empty;
+    [ObservableProperty] public partial bool IsEditing { get; set; } = false;
 
     public ObservableCollection<PlistSectionViewModel> SubTabs { get; } = [];
     public ObservableCollection<PlistItemViewModel> Items { get; } = [];
 
     public bool HasSubTabs => SubTabs.Count > 0;
+
+    // Reference to the parent list containing this tab (so it can remove itself)
+    public ObservableCollection<PlistSectionViewModel>? ParentCollection { get; set; }
 
     // --- CRUD Commands for Tab/Section Level ---
 
@@ -32,16 +36,28 @@ public partial class PlistSectionViewModel : ObservableObject
     [RelayCommand]
     public void AddSubTab()
     {
-        SubTabs.Add(new PlistSectionViewModel
+        var newSub = new PlistSectionViewModel
         {
-            Name = "NewDict"
-        });
+            Name = "NewDict",
+            ParentCollection = SubTabs // <-- Crucial so it knows how to delete itself from its parent
+        };
+        SubTabs.Add(newSub);
         OnPropertyChanged(nameof(HasSubTabs));
     }
 
-    public static PlistSectionViewModel Create(string name, XElement element)
+    [RelayCommand]
+    public void ToggleEdit() => IsEditing = !IsEditing;
+
+    [RelayCommand]
+    public void Delete() => ParentCollection?.Remove(this);
+
+    public static PlistSectionViewModel Create(string name, XElement element, ObservableCollection<PlistSectionViewModel>? parent = null)
     {
-        var section = new PlistSectionViewModel { Name = name };
+        var section = new PlistSectionViewModel
+        {
+            Name = name,
+            ParentCollection = parent
+        };
 
         if (element.Name.LocalName == "dict")
         {
@@ -53,10 +69,9 @@ public partial class PlistSectionViewModel : ObservableObject
                     string childKey = elements[i].Value;
                     XElement childValue = elements[i + 1];
 
-                    // Accept both nested dicts AND arrays as top-level sub-tabs
                     if (childValue.Name.LocalName == "dict" || childValue.Name.LocalName == "array")
                     {
-                        section.SubTabs.Add(Create(childKey, childValue));
+                        section.SubTabs.Add(Create(childKey, childValue, section.SubTabs));
                     }
                     else
                     {
@@ -67,16 +82,11 @@ public partial class PlistSectionViewModel : ObservableObject
         }
         else if (element.Name.LocalName == "array")
         {
-            // Treat array items as regular children inside this tab
             var arrayItems = element.Elements().ToList();
             for (int i = 0; i < arrayItems.Count; i++)
             {
                 section.Items.Add(PlistItemViewModel.FromXElement($"Item {i}", arrayItems[i], section.Items));
             }
-        }
-        else
-        {
-            section.Items.Add(PlistItemViewModel.FromXElement(name, element, section.Items));
         }
 
         return section;
