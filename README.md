@@ -2,6 +2,8 @@
 
 A cross-platform desktop application for viewing and editing Apple property list (`.plist`) files, built with [Avalonia UI](https://avaloniaui.net/) and .NET 10.
 
+<img src="PlistEditor/Assets/Screenshot.png" alt="PlistEditor" />
+
 ## Features
 
 - Open and browse `.plist` files through a native file picker
