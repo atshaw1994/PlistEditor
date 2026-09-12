@@ -25,23 +25,40 @@
             <DockPanel Margin="2">
                 <!-- Action Toolbar -->
                 <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="8" Margin="0,0,0,8">
-                    <Button Content="+ Add Entry" Command="{Binding AddItemCommand}" Padding="8,4"/>
-                    <Button Content="+ Add Sub-Dict (Tab)" Command="{Binding AddSubTabCommand}" Padding="8,4"/>
+                    <Button Command="{Binding AddItemCommand}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <ic:SymbolIcon Symbol="DocumentAdd" FontSize="16"/>
+                            <Label Content="New Element"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding AddSubTabCommand}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <ic:SymbolIcon Symbol="RowChild" FontSize="16"/>
+                            <Label Content="New Sub-Dict (Tab)"/>
+                        </StackPanel>
+                    </Button>
                 </StackPanel>
 
                 <!-- Sub-Tabs if current dictionary has nested dictionaries -->
                 <TabControl ItemsSource="{Binding SubTabs}" 
                             IsVisible="{Binding HasSubTabs}"
                             ItemTemplate="{StaticResource TabHeaderTemplate}"
-                            ContentTemplate="{StaticResource RecursiveTabTemplate}" />
+                            ContentTemplate="{StaticResource RecursiveTabTemplate}" 
+                            DockPanel.Dock="Top"
+                            TabStripPlacement="Left"/>
 
                 <!-- TreeView for leaf items & array elements -->
                 <TreeView ItemsSource="{Binding Items}" 
                           IsVisible="{Binding !HasSubTabs}" 
                           Margin="0,5,0,0">
+                    <TreeView.Styles>
+                        <Style Selector="TreeViewItem">
+                            <Setter Property="HorizontalAlignment" Value="Stretch" />
+                        </Style>
+                    </TreeView.Styles>
                     <TreeView.ItemTemplate>
                         <TreeDataTemplate x:DataType="vm:PlistItemViewModel" ItemsSource="{Binding Children}">
-                            <views:PlistItemControl />
+                            <views:PlistItemControl HorizontalAlignment="Stretch"/>
                         </TreeDataTemplate>
                     </TreeView.ItemTemplate>
                 </TreeView>
@@ -71,6 +88,9 @@
         <TabControl ItemsSource="{Binding FirstLevel}" 
                     SelectedItem="{Binding SelectedSection}"
                     ItemTemplate="{StaticResource TabHeaderTemplate}"
-                    ContentTemplate="{StaticResource RecursiveTabTemplate}" />
+                    ContentTemplate="{StaticResource RecursiveTabTemplate}" 
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Stretch"
+                    TabStripPlacement="Left"/>
     </DockPanel>
 </Window>

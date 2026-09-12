@@ -14,7 +14,7 @@
                                Value="AQAAAA=="/>
     </Design.DataContext>
 
-    <Grid ColumnDefinitions="160,110,*,Auto" Margin="0,2">
+    <Grid ColumnDefinitions="160,110,*,Auto" Margin="0,2,10,2">
         <!-- Column 0: Key Name -->
         <!-- Read-Only Key Label -->
         <TextBlock Grid.Column="0" 
