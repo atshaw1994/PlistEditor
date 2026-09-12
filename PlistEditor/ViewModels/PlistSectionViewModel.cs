@@ -1,14 +1,18 @@
-﻿using System.Collections.ObjectModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Xml.Linq;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 
 namespace PlistEditor.ViewModels;
 
 public partial class PlistSectionViewModel : ObservableObject
 {
+    public Action? OnChanged { get; set; }
+
     [ObservableProperty] public partial string Name { get; set; } = string.Empty;
+    partial void OnNameChanged(string value) => OnChanged?.Invoke();
     [ObservableProperty] public partial bool IsEditing { get; set; } = false;
 
     public ObservableCollection<PlistSectionViewModel> SubTabs { get; } = [];
@@ -49,7 +53,12 @@ public partial class PlistSectionViewModel : ObservableObject
     public void ToggleEdit() => IsEditing = !IsEditing;
 
     [RelayCommand]
-    public void Delete() => ParentCollection?.Remove(this);
+    public void Delete()
+    {
+        ParentCollection?.Remove(this);
+        OnPropertyChanged(nameof(HasSubTabs));
+        OnChanged?.Invoke();
+    }
 
     public static PlistSectionViewModel Create(string name, XElement element, ObservableCollection<PlistSectionViewModel>? parent = null)
     {
@@ -111,5 +120,24 @@ public partial class PlistSectionViewModel : ObservableObject
         }
 
         return dict;
+    }
+
+    public PlistSectionViewModel()
+    {
+        SubTabs.CollectionChanged += (s, e) => OnChanged?.Invoke();
+        Items.CollectionChanged += (s, e) => OnChanged?.Invoke();
+    }
+
+    public void AttachChangeTracker(Action onChange)
+    {
+        OnChanged = onChange;
+        foreach (var sub in SubTabs) sub.AttachChangeTracker(onChange);
+        foreach (var item in Items) AttachItemTracker(item, onChange);
+    }
+
+    private static void AttachItemTracker(PlistItemViewModel item, Action onChange)
+    {
+        item.OnChanged = onChange;
+        foreach (var child in item.Children) AttachItemTracker(child, onChange);
     }
 }

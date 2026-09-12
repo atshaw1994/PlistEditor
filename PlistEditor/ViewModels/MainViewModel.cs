@@ -13,13 +13,22 @@ namespace PlistEditor.ViewModels;
 
 public partial class MainViewModel : ViewModelBase
 {
+    public string WindowTitle => $"PlistEditor - {System.IO.Path.GetFileName(PlistFilePath)}{(IsDirty ? " *" : "")}";
+
     public ObservableCollection<PlistSectionViewModel> FirstLevel { get; } = [];
 
     public Func<Task<IStorageFile?>>? OpenFilePickerAsync { get; set; }
     public Func<Task<IStorageFile?>>? SaveFilePickerAsync { get; set; }
 
     [ObservableProperty] public partial PlistSectionViewModel? SelectedSection { get; set; }
-    [ObservableProperty] public partial string PlistFilePath { get; set; } = "No file opened";
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(WindowTitle))]
+    public partial bool IsDirty { get; set; } = false;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(WindowTitle))]
+    public partial string PlistFilePath { get; set; } = "No file opened";
 
     [RelayCommand]
     public async Task OpenPlistAsync()
@@ -57,6 +66,14 @@ public partial class MainViewModel : ViewModelBase
             }
 
             SelectedSection = FirstLevel.FirstOrDefault();
+
+            // After loading root sections:
+            foreach (var section in FirstLevel)
+            {
+                section.AttachChangeTracker(MarkDirty);
+            }
+
+            IsDirty = false; // Reset clean state on newly loaded file
         }
         catch (Exception ex)
         {
@@ -119,6 +136,8 @@ public partial class MainViewModel : ViewModelBase
 
             await using var stream = await file.OpenWriteAsync();
             await doc.SaveAsync(stream, SaveOptions.None, default);
+
+            IsDirty = false; // Mark clean after saving
         }
         catch (Exception ex)
         {
@@ -150,5 +169,10 @@ public partial class MainViewModel : ViewModelBase
         }
 
         SelectedSection = FirstLevel.FirstOrDefault();
+    }
+
+    public void MarkDirty()
+    {
+        if (!IsDirty) IsDirty = true;
     }
 }

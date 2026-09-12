@@ -9,7 +9,7 @@
         x:Class="PlistEditor.Views.MainWindow"
         x:DataType="vm:MainViewModel"
         Icon="/Assets/PlistEditor.ico"
-        Title="PlistEditor">
+        Title="{Binding WindowTitle}">
     <Design.DataContext>
         <vm:MainViewModel />
     </Design.DataContext>
@@ -152,7 +152,7 @@
                         <Label Content="Open"/>
                     </StackPanel>
                 </Button>
-                <Button Command="{Binding SavePlistCommand}" Width="64">
+                <Button Command="{Binding SavePlistCommand}" Width="64" IsVisible="{Binding IsDirty}">
                     <StackPanel Spacing="4" HorizontalAlignment="Center">
                         <ic:SymbolIcon Symbol="Save"/>
                         <Label Content="Save"/>

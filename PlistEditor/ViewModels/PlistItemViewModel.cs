@@ -20,6 +20,10 @@ public enum PlistItemType
 
 public partial class PlistItemViewModel : ObservableValidator
 {
+    public PlistItemViewModel() => Children.CollectionChanged += (s, e) => OnChanged?.Invoke();
+
+    public Action? OnChanged { get; set; }
+
     [ObservableProperty]
     public partial string Key { get; set; } = string.Empty;
 
@@ -85,12 +89,14 @@ public partial class PlistItemViewModel : ObservableValidator
                     Value = false;
                 }
                 OnPropertyChanged(nameof(ValueAsBool));
+                OnChanged?.Invoke();
                 break;
             case PlistItemType.Integer:
                 if (Value is not long)
                 {
                     Value = long.TryParse(Value?.ToString(), out long i) ? i : 0L;
                 }
+                OnChanged?.Invoke();
                 break;
             case PlistItemType.Data:
                 if (Value is not string str || !IsHexFormat(str))
@@ -98,15 +104,19 @@ public partial class PlistItemViewModel : ObservableValidator
                     byte[] bytes = Encoding.UTF8.GetBytes(Value?.ToString() ?? string.Empty);
                     Value = Convert.ToHexString(bytes);
                 }
+                OnChanged?.Invoke();
                 break;
             case PlistItemType.String:
                 if (Value is not string)
                 {
                     Value = Value?.ToString() ?? string.Empty;
                 }
+                OnChanged?.Invoke();
                 break;
         }
     }
+    partial void OnKeyChanged(string value) => OnChanged?.Invoke();
+    partial void OnValueChanged(object? value) => OnChanged?.Invoke();
 
     public static PlistItemViewModel FromXElement(string key, XElement element, ObservableCollection<PlistItemViewModel>? parent = null)
     {
@@ -214,4 +224,5 @@ public partial class PlistItemViewModel : ObservableValidator
 
     [RelayCommand]
     public void ToggleEdit() => IsEditing = !IsEditing;
+
 }
