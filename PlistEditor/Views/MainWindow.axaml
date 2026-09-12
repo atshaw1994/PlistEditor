@@ -8,7 +8,7 @@
         mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="720"
         x:Class="PlistEditor.Views.MainWindow"
         x:DataType="vm:MainViewModel"
-        Icon="/Assets/avalonia-logo.ico"
+        Icon="/Assets/PlistEditor.ico"
         Title="PlistEditor">
     <Design.DataContext>
         <vm:MainViewModel />
