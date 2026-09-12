@@ -14,6 +14,17 @@
         <vm:MainViewModel />
     </Design.DataContext>
 
+    <!-- Keyboard Shortcuts -->
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Ctrl+R" Command="{Binding SnapshotCommand}" />
+        <KeyBinding Gesture="Cmd+R" Command="{Binding SnapshotCommand}" />
+        <KeyBinding Gesture="Ctrl+Shift+R" Command="{Binding CleanSnapshotCommand}" />
+        <KeyBinding Gesture="Cmd+Shift+R" Command="{Binding CleanSnapshotCommand}" />
+        <KeyBinding Gesture="Ctrl+S" Command="{Binding SavePlistCommand}" />
+        <KeyBinding Gesture="Cmd+S" Command="{Binding SavePlistCommand}" />
+    </Window.KeyBindings>
+
+    <!-- Resources -->
     <Window.Resources>
         <!-- Tab Header Template -->
         <DataTemplate x:Key="TabHeaderTemplate" x:DataType="vm:PlistSectionViewModel">
@@ -156,6 +167,22 @@
                     <StackPanel Spacing="4" HorizontalAlignment="Center">
                         <ic:SymbolIcon Symbol="Save"/>
                         <Label Content="Save"/>
+                    </StackPanel>
+                </Button>
+
+                <Rectangle Width="1" Fill="LightGray" Margin="4,0"/>
+
+                <!-- Snapshot Buttons -->
+                <Button Command="{Binding SnapshotCommand}" ToolTip.Tip="OC Snapshot (Ctrl+R)">
+                    <StackPanel Spacing="4" HorizontalAlignment="Center">
+                        <ic:SymbolIcon Symbol="Camera"/>
+                        <Label Content="Snapshot"/>
+                    </StackPanel>
+                </Button>
+                <Button Command="{Binding CleanSnapshotCommand}" ToolTip.Tip="Clean OC Snapshot (Ctrl+Shift+R)">
+                    <StackPanel Spacing="4" HorizontalAlignment="Center">
+                        <ic:SymbolIcon Symbol="Sparkle"/>
+                        <Label Content="Clean Snapshot"/>
                     </StackPanel>
                 </Button>
             </StackPanel>

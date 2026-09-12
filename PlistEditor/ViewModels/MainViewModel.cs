@@ -3,6 +3,7 @@ using Avalonia.Platform;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using PlistEditor.Services;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -18,6 +19,7 @@ public partial class MainViewModel : ViewModelBase
     public ObservableCollection<PlistSectionViewModel> FirstLevel { get; } = [];
 
     public Func<Task<IStorageFile?>>? OpenFilePickerAsync { get; set; }
+    public Func<Task<IStorageFolder?>>? OpenFolderPickerAsync { get; set; }
     public Func<Task<IStorageFile?>>? SaveFilePickerAsync { get; set; }
 
     [ObservableProperty] public partial PlistSectionViewModel? SelectedSection { get; set; }
@@ -142,6 +144,24 @@ public partial class MainViewModel : ViewModelBase
         catch (Exception ex)
         {
             Console.WriteLine($"Error saving plist: {ex.Message}");
+        }
+    }
+
+    [RelayCommand]
+    public async Task SnapshotAsync() => await PerformSnapshotAsync(isClean: false);
+
+    [RelayCommand]
+    public async Task CleanSnapshotAsync() => await PerformSnapshotAsync(isClean: true);
+
+    private async Task PerformSnapshotAsync(bool isClean)
+    {
+        if (OpenFolderPickerAsync == null) return;
+
+        var folder = await OpenFolderPickerAsync();
+        if (folder != null)
+        {
+            string path = folder.Path.LocalPath;
+            OpenCoreSnapshotService.ExecuteSnapshot(this, path, isClean);
         }
     }
 
