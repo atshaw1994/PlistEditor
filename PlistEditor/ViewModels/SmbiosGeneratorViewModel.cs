@@ -28,11 +28,28 @@ public partial class SmbiosGeneratorViewModel : ObservableObject
     {
         // Initialize with the main view model to access shared properties or methods if needed
         MainViewModelRef = mainViewModel;
+
+        _ = InitializeAsync();
+    }
+
+    public async Task InitializeAsync()
+    {
+        string macserialPath = GetMacSerialPath();
+
+        if (File.Exists(macserialPath))
+        {
+            MacSerialPath = macserialPath;
+            StatusMessage = "Loading local Mac models...";
+            await LoadModelsFromMacSerialAsync();
+        }
+        else
+        {
+        }
     }
 
     [ObservableProperty] public partial string MacSerialPath { get; set; } = string.Empty;
     [ObservableProperty] public partial bool IsDownloading { get; set; } = false;
-    [ObservableProperty] public partial string StatusMessage { get; set; } = "Ready to download.";
+    [ObservableProperty] public partial string StatusMessage { get; set; } = string.Empty;
 
     [ObservableProperty] public partial string? SelectedCategory { get; set; } = string.Empty;
     [ObservableProperty] public partial string? SelectedModel { get; set; } = string.Empty;
@@ -78,7 +95,6 @@ public partial class SmbiosGeneratorViewModel : ObservableObject
             using var client = new HttpClient();
             client.DefaultRequestHeaders.Add("User-Agent", "PlistEditor-App");
 
-            // Query GitHub API for latest release
             string json = await client.GetStringAsync("https://api.github.com/repos/acidanthera/OpenCorePkg/releases/latest");
             using var doc = JsonDocument.Parse(json);
 
@@ -103,13 +119,10 @@ public partial class SmbiosGeneratorViewModel : ObservableObject
             byte[] zipData = await client.GetByteArrayAsync(downloadUrl);
 
             StatusMessage = "Extracting macserial binary...";
-            string targetDirectory = Path.Combine(Path.GetTempPath(), "PlistEditor_macserial");
-            Directory.CreateDirectory(targetDirectory);
 
             string exeName = OperatingSystem.IsWindows() ? "macserial.exe" : "macserial";
-            string targetFilePath = Path.Combine(targetDirectory, exeName);
+            string targetFilePath = Path.Combine(AppContext.BaseDirectory, exeName);
 
-            // Extract ONLY macserial from the zip stream
             using (var zipStream = new MemoryStream(zipData))
             using (var archive = new ZipArchive(zipStream, ZipArchiveMode.Read))
             {
@@ -123,13 +136,11 @@ public partial class SmbiosGeneratorViewModel : ObservableObject
                     return;
                 }
 
-                // Extract with overwrite enabled to prevent file-lock/existence errors
                 macserialEntry.ExtractToFile(targetFilePath, overwrite: true);
             }
 
             MacSerialPath = targetFilePath;
 
-            // Make executable on macOS/Linux
             if (!OperatingSystem.IsWindows())
             {
                 Process.Start("chmod", $"+x \"{MacSerialPath}\"")?.WaitForExit();
@@ -244,5 +255,11 @@ public partial class SmbiosGeneratorViewModel : ObservableObject
                 Rom = Convert.ToHexString(romBytes).ToUpper()
             };
         }
+    }
+
+    private static string GetMacSerialPath()
+    {
+        string exeName = OperatingSystem.IsWindows() ? "macserial.exe" : "macserial";
+        return Path.Combine(AppContext.BaseDirectory, exeName);
     }
 }

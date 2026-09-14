@@ -3,25 +3,38 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="using:PlistEditor.ViewModels"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="450"
         x:Class="PlistEditor.Views.SmbiosGenerator"
         x:DataType="vm:SmbiosGeneratorViewModel"
-        Title="Select Mac Model" 
-        Width="350" Height="450"
+        Title="Smbios Generator" 
+        SizeToContent="WidthAndHeight"
+        MinWidth="450"
         WindowStartupLocation="CenterOwner"
-        CanResize="False">
+        CanResize="False"
+        Icon="/Assets/PlistEditor.ico">
     <StackPanel Margin="20" Spacing="15">
         <!-- Download Header section -->
-        <Border Padding="12" Background="#1E1E1E" CornerRadius="6">
+        <Border Margin="-20,-20,-20,0" 
+                Padding="12" 
+                IsVisible="{Binding MacSerialPath, Converter={x:Static StringConverters.IsNullOrEmpty}}"
+                Background="{DynamicResource CaptionButtonBackground}">
             <StackPanel Spacing="8">
-                <Button Content="Download Latest macserial"
+                <TextBlock Text="MacSerial not found!" 
+                           Foreground="Red"
+                           FontWeight="Bold"
+                           FontSize="11" 
+                           IsVisible="{Binding !IsDownloading}"
+                           TextWrapping="Wrap"/>
+                <Button Content="Download macserial"
                         Command="{Binding DownloadMacSerialCommand}"
                         IsEnabled="{Binding !IsDownloading}"
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Center"/>
                 <TextBlock Text="{Binding StatusMessage}" 
+                           Opacity="0.4"
+                           FontStyle="Italic"
                            FontSize="11" 
-                           Foreground="Gray" 
+                           IsVisible="{Binding IsDownloading}"
                            TextWrapping="Wrap"/>
             </StackPanel>
         </Border>

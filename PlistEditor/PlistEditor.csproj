@@ -10,6 +10,10 @@
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <AvaloniaResource Remove="Assets\macserial.exe" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Avalonia" />
@@ -22,5 +26,17 @@
     </PackageReference>
     <PackageReference Include="CommunityToolkit.Mvvm" />
     <PackageReference Include="FluentIcons.Avalonia" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\macserial.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Assets\PlistEditor.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>
