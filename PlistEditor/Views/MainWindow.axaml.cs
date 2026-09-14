@@ -1,19 +1,80 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Platform.Storage;
+using CommunityToolkit.Mvvm.Input;
+using PlistEditor.Models;
+using PlistEditor.Services;
 using PlistEditor.ViewModels;
+using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace PlistEditor.Views;
 
 public partial class MainWindow : Window
 {
+    private double _lastValidWidth = 1280;
+    private double _lastValidHeight = 720;
+
     public MainWindow()
     {
+        // 1. Restore dimensions BEFORE the window is rendered on screen
+        RestoreWindowSettings();
+
         InitializeComponent();
 
+        // 2. Track size changes & handle window close
+        Closing += OnWindowClosing;
+        SizeChanged += OnWindowSizeChanged;
+
+        // 3. Set up the ViewModel with file operations
         DataContextChanged += OnDataContextChanged;
     }
 
-    private void OnDataContextChanged(object? sender, System.EventArgs e)
+    private void RestoreWindowSettings()
+    {
+        var settings = SettingsService.LoadSettings();
+
+        if (settings.WindowWidth >= 400)
+        {
+            Width = settings.WindowWidth;
+            _lastValidWidth = settings.WindowWidth;
+        }
+
+        if (settings.WindowHeight >= 300)
+        {
+            Height = settings.WindowHeight;
+            _lastValidHeight = settings.WindowHeight;
+        }
+
+        if (Enum.TryParse<WindowState>(settings.WindowState, out var state))
+        {
+            WindowState = state;
+        }
+    }
+
+    private void OnWindowSizeChanged(object? sender, SizeChangedEventArgs e)
+    {
+        // Capture active dimensions, ignoring teardown collapse
+        if (WindowState == WindowState.Normal && e.NewSize.Width >= 400 && e.NewSize.Height >= 300)
+        {
+            _lastValidWidth = e.NewSize.Width;
+            _lastValidHeight = e.NewSize.Height;
+        }
+    }
+
+    private void OnWindowClosing(object? sender, WindowClosingEventArgs e)
+    {
+        var settings = new AppSettings
+        {
+            WindowState = WindowState.ToString(),
+            WindowWidth = _lastValidWidth,
+            WindowHeight = _lastValidHeight
+        };
+
+        SettingsService.SaveSettings(settings);
+    }
+
+    private void OnDataContextChanged(object? sender, EventArgs e)
     {
         if (DataContext is MainViewModel vm)
         {
@@ -25,7 +86,7 @@ public partial class MainWindow : Window
         }
     }
 
-    private async System.Threading.Tasks.Task<IStorageFolder?> OpenFolderAsync()
+    private async Task<IStorageFolder?> OpenFolderAsync()
     {
         var folders = await StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
         {
@@ -36,7 +97,7 @@ public partial class MainWindow : Window
         return folders.Count > 0 ? folders[0] : null;
     }
 
-    private async System.Threading.Tasks.Task<IStorageFile?> SaveFileAsync()
+    private async Task<IStorageFile?> SaveFileAsync()
     {
         var topLevel = GetTopLevel(this);
         if (topLevel == null) return null;
@@ -49,7 +110,7 @@ public partial class MainWindow : Window
         });
     }
 
-    private async System.Threading.Tasks.Task<IStorageFile?> OpenFileAsync()
+    private async Task<IStorageFile?> OpenFileAsync()
     {
         var topLevel = GetTopLevel(this);
         if (topLevel == null) return null;

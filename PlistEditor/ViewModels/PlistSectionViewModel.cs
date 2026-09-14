@@ -140,4 +140,9 @@ public partial class PlistSectionViewModel : ObservableObject
         item.OnChanged = onChange;
         foreach (var child in item.Children) AttachItemTracker(child, onChange);
     }
+
+    public void NotifyHasSubTabsChanged()
+    {
+        OnPropertyChanged(nameof(HasSubTabs));
+    }
 }
