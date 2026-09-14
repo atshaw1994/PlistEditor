@@ -18,7 +18,7 @@ namespace PlistEditor.ViewModels;
 public partial class MainViewModel : ViewModelBase
 {
     public string WindowTitle => $"PlistEditor - {System.IO.Path.GetFileName(PlistFilePath)}{(IsDirty ? " *" : "")}";
-
+    public bool HasLoadedPlist => !string.IsNullOrEmpty(PlistFilePath) && PlistFilePath != "No file opened";
     public ObservableCollection<PlistSectionViewModel> FirstLevel { get; } = [];
 
     public Func<Task<IStorageFile?>>? OpenFilePickerAsync { get; set; }
@@ -34,6 +34,7 @@ public partial class MainViewModel : ViewModelBase
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(WindowTitle))]
+    [NotifyPropertyChangedFor(nameof(HasLoadedPlist))]
     public partial string PlistFilePath { get; set; } = "No file opened";
 
     [ObservableProperty] public partial SmbiosViewModel Smbios { get; set; } = new();
@@ -136,7 +137,7 @@ public partial class MainViewModel : ViewModelBase
         var owner = GetTopLevelWindow();
         if (owner == null) return;
 
-        var dialog = new SmbiosGenerator();
+        var dialog = new SmbiosGenerator(this);
         var result = await dialog.ShowDialog<SmbiosModel?>(owner);
 
         if (result != null)

@@ -16,6 +16,20 @@ namespace PlistEditor.ViewModels;
 
 public partial class SmbiosGeneratorViewModel : ObservableObject
 {
+    public MainViewModel? MainViewModelRef { get; }
+
+    public SmbiosGeneratorViewModel()
+    {
+        // Default constructor for design-time support
+        MainViewModelRef = new MainViewModel();
+    }
+
+    public SmbiosGeneratorViewModel(MainViewModel mainViewModel)
+    {
+        // Initialize with the main view model to access shared properties or methods if needed
+        MainViewModelRef = mainViewModel;
+    }
+
     [ObservableProperty] public partial string MacSerialPath { get; set; } = string.Empty;
     [ObservableProperty] public partial bool IsDownloading { get; set; } = false;
     [ObservableProperty] public partial string StatusMessage { get; set; } = "Ready to download.";

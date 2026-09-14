@@ -78,6 +78,7 @@
 
             <Button Content="Apply to Plist" 
                     Click="ApplyButton_Click" 
+                    IsEnabled="{Binding MainViewModelRef.HasLoadedPlist}"
                     HorizontalAlignment="Right" 
                     Margin="0,10,0,0"/>
         </StackPanel>
