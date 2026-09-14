@@ -157,6 +157,7 @@
         <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,10">
             <TextBlock Text="{Binding PlistFilePath}" Margin="10,0,0,0" FontWeight="Bold" FontSize="14" VerticalAlignment="Center"/>
             <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                <!-- Plist File Commands -->
                 <Button Command="{Binding OpenPlistCommand}" Width="64">
                     <StackPanel Spacing="4" HorizontalAlignment="Center">
                         <ic:SymbolIcon Symbol="Folder"/>
@@ -170,7 +171,15 @@
                     </StackPanel>
                 </Button>
 
-                <Rectangle Width="1" Fill="LightGray" Margin="4,0"/>
+                <Rectangle Width="1" Fill="LightGray" Margin="4,16"/>
+
+                <!-- SMBIOS Button -->
+                <Button Command="{Binding OpenSmbiosGeneratorCommand}">
+                    <StackPanel Spacing="4" HorizontalAlignment="Center">
+                        <ic:SymbolIcon Symbol="Desktop"/>
+                        <Label Content="GenSMBIOS"/>
+                    </StackPanel>
+                </Button>
 
                 <!-- Snapshot Buttons -->
                 <Button Command="{Binding SnapshotCommand}" ToolTip.Tip="OC Snapshot (Ctrl+R)">
@@ -181,8 +190,10 @@
                 </Button>
                 <Button Command="{Binding CleanSnapshotCommand}" ToolTip.Tip="Clean OC Snapshot (Ctrl+Shift+R)">
                     <StackPanel Spacing="4" HorizontalAlignment="Center">
-                        <ic:SymbolIcon Symbol="Sparkle"/>
-                        <Label Content="Clean Snapshot"/>
+                        <ic:SymbolIcon Symbol="Sparkle" HorizontalAlignment="Center"/>
+                        <TextBlock TextAlignment="Center" HorizontalAlignment="Center" FontSize="12">
+                            Clean<LineBreak/>Snapshot
+                        </TextBlock>
                     </StackPanel>
                 </Button>
             </StackPanel>

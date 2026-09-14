@@ -3,7 +3,10 @@ using Avalonia.Platform;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using PlistEditor.Helpers;
+using PlistEditor.Models;
 using PlistEditor.Services;
+using PlistEditor.Views;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -21,6 +24,7 @@ public partial class MainViewModel : ViewModelBase
     public Func<Task<IStorageFile?>>? OpenFilePickerAsync { get; set; }
     public Func<Task<IStorageFolder?>>? OpenFolderPickerAsync { get; set; }
     public Func<Task<IStorageFile?>>? SaveFilePickerAsync { get; set; }
+    public Func<Window?>? GetTopLevelWindow { get; set; }
 
     [ObservableProperty] public partial PlistSectionViewModel? SelectedSection { get; set; }
 
@@ -31,6 +35,8 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(WindowTitle))]
     public partial string PlistFilePath { get; set; } = "No file opened";
+
+    [ObservableProperty] public partial SmbiosViewModel Smbios { get; set; } = new();
 
     [RelayCommand]
     public async Task OpenPlistAsync()
@@ -83,36 +89,6 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
-    public MainViewModel()
-    {
-        // Check if Avalonia is running in the Visual Studio XAML Designer
-        if (Design.IsDesignMode)
-        {
-            LoadEmbeddedSample();
-            PlistFilePath = "Sample.plist (Design Mode)";
-        }
-    }
-
-    private void LoadEmbeddedSample()
-    {
-        try
-        {
-            var uri = new Uri("avares://PlistEditor/Assets/Sample.plist");
-
-            if (AssetLoader.Exists(uri))
-            {
-                using var stream = AssetLoader.Open(uri);
-                XDocument doc = XDocument.Load(stream);
-                ParsePlistDocument(doc);
-            }
-        }
-        catch (Exception ex)
-        {
-            // Log locally so previewer process doesn't fail silently
-            System.Diagnostics.Debug.WriteLine($"Design mode error: {ex.Message}");
-        }
-    }
-
     [RelayCommand]
     public async Task SavePlistAsync()
     {
@@ -153,6 +129,54 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     public async Task CleanSnapshotAsync() => await PerformSnapshotAsync(isClean: true);
 
+    [RelayCommand]
+    public async Task OpenSmbiosGeneratorAsync()
+    {
+        if (GetTopLevelWindow == null) return;
+        var owner = GetTopLevelWindow();
+        if (owner == null) return;
+
+        var dialog = new SmbiosGenerator();
+        var result = await dialog.ShowDialog<SmbiosModel?>(owner);
+
+        if (result != null)
+        {
+            Smbios.PopulateFromModel(result);
+            SmbiosService.InjectToPlatformInfo(this, result);
+            MarkDirty();
+        }
+    }
+
+    public MainViewModel()
+    {
+        // Check if Avalonia is running in the Visual Studio XAML Designer
+        if (Design.IsDesignMode)
+        {
+            LoadEmbeddedSample();
+            PlistFilePath = "Sample.plist (Design Mode)";
+        }
+    }
+
+    private void LoadEmbeddedSample()
+    {
+        try
+        {
+            var uri = new Uri("avares://PlistEditor/Assets/Sample.plist");
+
+            if (AssetLoader.Exists(uri))
+            {
+                using var stream = AssetLoader.Open(uri);
+                XDocument doc = XDocument.Load(stream);
+                ParsePlistDocument(doc);
+            }
+        }
+        catch (Exception ex)
+        {
+            // Log locally so previewer process doesn't fail silently
+            System.Diagnostics.Debug.WriteLine($"Design mode error: {ex.Message}");
+        }
+    }
+
     private async Task PerformSnapshotAsync(bool isClean)
     {
         if (OpenFolderPickerAsync == null) return;
@@ -189,6 +213,13 @@ public partial class MainViewModel : ViewModelBase
         }
 
         SelectedSection = FirstLevel.FirstOrDefault();
+    }
+
+    private void GenerateSerials(string selectedModel)
+    {
+        var modelData = SmbiosGeneratorHelper.GenerateForModel(selectedModel);
+        Smbios.PopulateFromModel(modelData);
+        MarkDirty();
     }
 
     public void MarkDirty()

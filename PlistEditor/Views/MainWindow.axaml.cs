@@ -79,10 +79,9 @@ public partial class MainWindow : Window
         if (DataContext is MainViewModel vm)
         {
             vm.OpenFilePickerAsync = OpenFileAsync;
-
             vm.SaveFilePickerAsync = SaveFileAsync;
-
             vm.OpenFolderPickerAsync = OpenFolderAsync;
+            vm.GetTopLevelWindow = () => this;
         }
     }
 
