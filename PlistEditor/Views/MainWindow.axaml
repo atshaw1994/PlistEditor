@@ -114,41 +114,46 @@
                         </StackPanel>
                     </Button>
                 </StackPanel>
+                               
+                <ScrollViewer>
+                    <StackPanel>
+                        <!-- TreeView for leaf items & array elements -->
+                        <TreeView ItemsSource="{Binding Items}" 
+                                  IsVisible="{Binding Items.Count, Converter={StaticResource GreaterThanZeroConverter}}"
+                                  Background="{DynamicResource CaptionButtonBackground}"
+                                  Margin="0,0,0,8">
+                            <TreeView.Styles>
+                                <Style Selector="TreeViewItem">
+                                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                </Style>
+                            </TreeView.Styles>
+                            <TreeView.ItemTemplate>
+                                <TreeDataTemplate x:DataType="vm:PlistItemViewModel" ItemsSource="{Binding Children}">
+                                    <views:PlistItemControl HorizontalAlignment="Stretch"/>
+                                </TreeDataTemplate>
+                            </TreeView.ItemTemplate>
+                        </TreeView>
 
-                <!-- Sub-Tabs if current dictionary has nested dictionaries -->
-                <TabControl ItemsSource="{Binding SubTabs}" 
-                            IsVisible="{Binding HasSubTabs}"
-                            ItemTemplate="{StaticResource TabHeaderTemplate}"
-                            ContentTemplate="{StaticResource RecursiveTabTemplate}" 
-                            DockPanel.Dock="Top"
-                            TabStripPlacement="Left">
-                        <TabControl.Styles>
-                            <Style Selector="TabItem">
-                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                            </Style>
+                        <!-- Sub-Tabs if current dictionary has nested dictionaries -->
+                        <TabControl ItemsSource="{Binding SubTabs}" 
+                                    IsVisible="{Binding HasSubTabs}"
+                                    ItemTemplate="{StaticResource TabHeaderTemplate}"
+                                    ContentTemplate="{StaticResource RecursiveTabTemplate}" 
+                                    DockPanel.Dock="Top"
+                                    TabStripPlacement="Left">
+                                <TabControl.Styles>
+                                    <Style Selector="TabItem">
+                                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                    </Style>
 
-                            <!-- Reveal buttons when hovering over the TabItem -->
-                            <Style Selector="TabItem:pointerover StackPanel#HeaderActions">
-                                <Setter Property="Opacity" Value="1" />
-                            </Style>
-                        </TabControl.Styles>
-                </TabControl>
-
-                <!-- TreeView for leaf items & array elements -->
-                <TreeView ItemsSource="{Binding Items}" 
-                          IsVisible="{Binding !HasSubTabs}" 
-                          Margin="0,5,0,0">
-                    <TreeView.Styles>
-                        <Style Selector="TreeViewItem">
-                            <Setter Property="HorizontalAlignment" Value="Stretch" />
-                        </Style>
-                    </TreeView.Styles>
-                    <TreeView.ItemTemplate>
-                        <TreeDataTemplate x:DataType="vm:PlistItemViewModel" ItemsSource="{Binding Children}">
-                            <views:PlistItemControl HorizontalAlignment="Stretch"/>
-                        </TreeDataTemplate>
-                    </TreeView.ItemTemplate>
-                </TreeView>
+                                    <!-- Reveal buttons when hovering over the TabItem -->
+                                    <Style Selector="TabItem:pointerover StackPanel#HeaderActions">
+                                        <Setter Property="Opacity" Value="1" />
+                                    </Style>
+                                </TabControl.Styles>
+                        </TabControl>
+                    </StackPanel>
+                </ScrollViewer>
             </DockPanel>
         </DataTemplate>
     </Window.Resources>

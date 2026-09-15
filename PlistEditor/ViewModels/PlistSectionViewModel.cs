@@ -97,6 +97,11 @@ public partial class PlistSectionViewModel : ObservableObject
                 section.Items.Add(PlistItemViewModel.FromXElement($"Item {i}", arrayItems[i], section.Items));
             }
         }
+        else
+        {
+            // If the element is neither a dict nor an array, treat it as a single item
+            section.Items.Add(PlistItemViewModel.FromXElement(name, element, section.Items));
+        }
 
         return section;
     }

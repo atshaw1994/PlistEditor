@@ -216,13 +216,6 @@ public partial class MainViewModel : ViewModelBase
         SelectedSection = FirstLevel.FirstOrDefault();
     }
 
-    private void GenerateSerials(string selectedModel)
-    {
-        var modelData = SmbiosGeneratorHelper.GenerateForModel(selectedModel);
-        Smbios.PopulateFromModel(modelData);
-        MarkDirty();
-    }
-
     public void MarkDirty()
     {
         if (!IsDirty) IsDirty = true;
