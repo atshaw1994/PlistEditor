@@ -176,7 +176,7 @@
         </Grid>
 
         <!-- Main TabControl for first-level dictionaries -->
-        <TabControl ItemsSource="{Binding FirstLevel}" 
+        <TabControl ItemsSource="{Binding RootLevel}" 
                     SelectedItem="{Binding SelectedSection}"
                     ItemTemplate="{StaticResource TabHeaderTemplate}"
                     ContentTemplate="{StaticResource RecursiveTabTemplate}" 
