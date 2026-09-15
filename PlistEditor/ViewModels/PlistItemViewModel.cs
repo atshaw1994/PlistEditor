@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
@@ -20,7 +21,15 @@ public enum PlistItemType
 
 public partial class PlistItemViewModel : ObservableValidator
 {
-    public PlistItemViewModel() => Children.CollectionChanged += (s, e) => OnChanged?.Invoke();
+    public PlistItemViewModel()
+    {
+        // Re-evaluate display and notify parent when children change
+        Children.CollectionChanged += (s, e) =>
+        {
+            OnPropertyChanged(nameof(DisplayName));
+            OnChanged?.Invoke();
+        };
+    }
 
     public Action? OnChanged { get; set; }
 
@@ -39,6 +48,41 @@ public partial class PlistItemViewModel : ObservableValidator
 
     [ObservableProperty]
     public partial bool IsEditing { get; set; } = false;
+
+    /// <summary>
+    /// Gets the formatted display label. If a child with key "Comment" exists, 
+    /// appends its string value in parentheses.
+    /// </summary>
+    public string DisplayName
+    {
+        get
+        {
+            var commentChild = Children.FirstOrDefault(c => string.Equals(c.Key, "Comment", StringComparison.OrdinalIgnoreCase));
+            var bundlePathChild = Children.FirstOrDefault(c => string.Equals(c.Key, "BundlePath", StringComparison.OrdinalIgnoreCase));
+            var pathChild = Children.FirstOrDefault(c => string.Equals(c.Key, "Path", StringComparison.OrdinalIgnoreCase));
+            string? commentValue = commentChild?.Value?.ToString();
+            string? bundlePathValue = bundlePathChild?.Value?.ToString();
+            string? pathValue = pathChild?.Value?.ToString();
+
+
+            if (!string.IsNullOrWhiteSpace(bundlePathValue))
+            {
+                return $"{Key} ({System.IO.Path.GetFileNameWithoutExtension(bundlePathValue.Split('/')[0])})";
+            }
+
+            if (!string.IsNullOrWhiteSpace(pathValue))
+            {
+                return $"{Key} ({System.IO.Path.GetFileNameWithoutExtension(pathValue.Split('/')[0])})";
+            }
+
+            if (!string.IsNullOrWhiteSpace(commentValue))
+            {
+                return $"{Key} ({commentValue})";
+            }
+
+            return Key;
+        }
+    }
 
     public ObservableCollection<PlistItemViewModel> Children { get; } = [];
     public ObservableCollection<PlistItemViewModel>? ParentCollection { get; set; }
@@ -115,8 +159,16 @@ public partial class PlistItemViewModel : ObservableValidator
                 break;
         }
     }
-    partial void OnKeyChanged(string value) => OnChanged?.Invoke();
-    partial void OnValueChanged(object? value) => OnChanged?.Invoke();
+    partial void OnKeyChanged(string value)
+    {
+        OnPropertyChanged(nameof(DisplayName));
+        OnChanged?.Invoke();
+    }
+    partial void OnValueChanged(object? value)
+    {
+        OnPropertyChanged(nameof(DisplayName));
+        OnChanged?.Invoke();
+    }
 
     public static PlistItemViewModel FromXElement(string key, XElement element, ObservableCollection<PlistItemViewModel>? parent = null)
     {

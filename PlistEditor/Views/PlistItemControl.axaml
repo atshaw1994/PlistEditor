@@ -9,12 +9,14 @@
              x:DataType="vm:PlistItemViewModel">
 
     <Design.DataContext>
-        <vm:PlistItemViewModel Key="SampleItem"
-                               Type="Boolean" 
-                               Value="AQAAAA=="/>
+        <vm:PlistItemViewModel Key="SampleItem" Type="Boolean" Value="AQAAAA==">
+            <vm:PlistItemViewModel.Children>
+                <vm:PlistItemViewModel Key="Comment" Type="String" Value="Sample Comment"/>
+            </vm:PlistItemViewModel.Children>
+        </vm:PlistItemViewModel>
     </Design.DataContext>
 
-    <Grid ColumnDefinitions="160,110,*,Auto" Background="Transparent" Margin="0,2,10,2">
+    <Grid ColumnDefinitions="*,*,*,Auto" Background="Transparent" Margin="0,2,10,2">
         <Grid.Styles>
             <!-- 1. Default state: Hidden with smooth fade transition -->
             <Style Selector="StackPanel.item-actions">
@@ -40,7 +42,7 @@
         <!-- Column 0: Key Name -->
         <!-- Read-Only Key Label -->
         <TextBlock Grid.Column="0" 
-                   Text="{Binding Key}" 
+                   Text="{Binding DisplayName}" 
                    FontWeight="SemiBold" 
                    VerticalAlignment="Center"
                    IsVisible="{Binding !IsEditing}"
