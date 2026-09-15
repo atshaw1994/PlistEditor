@@ -4,7 +4,7 @@ using System.Globalization;
 
 namespace PlistEditor.Helpers;
 
-internal class GreaterThanZeroConverter : IValueConverter
+public class GreaterThanZeroConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {

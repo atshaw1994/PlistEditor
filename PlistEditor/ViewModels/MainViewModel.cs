@@ -1,9 +1,10 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Platform;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using PlistEditor.Helpers;
 using PlistEditor.Models;
 using PlistEditor.Services;
 using PlistEditor.Views;
@@ -173,6 +174,28 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
+    [RelayCommand]
+    public async Task OpenSettingsAsync()
+    {
+        //if (GetTopLevelWindow == null) return;
+        //var owner = GetTopLevelWindow();
+        //if (owner == null) return;
+
+        //var dialog = new SettingsWindow();
+        //var result = await dialog.ShowDialog<AppSettings?>(owner);
+        //if (result != null)
+        //{
+        //    SettingsService.LoadSettings();
+        //}
+    }
+
+    [RelayCommand]
+    public static void Exit()
+    {
+        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            desktop.Shutdown();
+    }
+
     public MainViewModel()
     {
         // Check if Avalonia is running in the Visual Studio XAML Designer
@@ -180,6 +203,10 @@ public partial class MainViewModel : ViewModelBase
         {
             LoadEmbeddedSample();
             PlistFilePath = "Sample.plist (Design Mode)";
+        }
+        else
+        {
+            _ = CreatePlistAsync();
         }
     }
 

@@ -1,11 +1,8 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Platform.Storage;
-using CommunityToolkit.Mvvm.Input;
-using PlistEditor.Models;
 using PlistEditor.Services;
 using PlistEditor.ViewModels;
 using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace PlistEditor.Views;
@@ -32,7 +29,7 @@ public partial class MainWindow : Window
 
     private void RestoreWindowSettings()
     {
-        var settings = SettingsService.LoadSettings();
+        var settings = SettingsService.Current;
 
         if (settings.WindowWidth >= 400)
         {
@@ -64,14 +61,12 @@ public partial class MainWindow : Window
 
     private void OnWindowClosing(object? sender, WindowClosingEventArgs e)
     {
-        var settings = new AppSettings
-        {
-            WindowState = WindowState.ToString(),
-            WindowWidth = _lastValidWidth,
-            WindowHeight = _lastValidHeight
-        };
+        var settings = SettingsService.Current;
+        settings.WindowState = WindowState.ToString();
+        settings.WindowWidth = _lastValidWidth;
+        settings.WindowHeight = _lastValidHeight;
 
-        SettingsService.SaveSettings(settings);
+        SettingsService.SaveSettings();
     }
 
     private void OnDataContextChanged(object? sender, EventArgs e)

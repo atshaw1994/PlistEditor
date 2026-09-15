@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="using:PlistEditor"
              xmlns:helpers="using:PlistEditor.Helpers"
+             xmlns:ic="using:FluentIcons.Avalonia"
              x:Class="PlistEditor.App"
              RequestedThemeVariant="Default">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
@@ -17,6 +18,61 @@
     <Application.Resources>
         <ResourceDictionary>
             <helpers:GreaterThanZeroConverter x:Key="GreaterThanZeroConverter" />
+
+            <MenuFlyout x:Key="MainMenuFlyout" Placement="BottomEdgeAlignedRight">
+                <!-- Plist File Commands -->
+                <MenuItem Header="New Plist" Command="{ReflectionBinding $parent[Window].DataContext.CreatePlistCommand}">
+                    <MenuItem.Icon>
+                        <ic:SymbolIcon Symbol="Document" FontSize="16" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Open Plist" Command="{ReflectionBinding $parent[Window].DataContext.OpenPlistCommand}">
+                    <MenuItem.Icon>
+                        <ic:FluentIcon Icon="Folder" IconSize="Size16" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Save Plist" Command="{ReflectionBinding $parent[Window].DataContext.SavePlistCommand}">
+                    <MenuItem.Icon>
+                        <ic:FluentIcon Icon="Save" IconSize="Size16" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator/>
+                <!-- Snapshot Buttons -->
+                <MenuItem Header="Snapshot" Command="{ReflectionBinding $parent[Window].DataContext.SnapshotCommand}">
+                    <MenuItem.Icon>
+                        <ic:FluentIcon Icon="Camera" IconSize="Size16" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Clean Snapshot" Command="{ReflectionBinding $parent[Window].DataContext.CleanSnapshotCommand}">
+                    <MenuItem.Icon>
+                        <ic:FluentIcon Icon="Sparkle" IconSize="Size16" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator/>
+                <!-- SMBIOS Generator -->
+                <MenuItem Header="SMBIOS Generator" Command="{ReflectionBinding $parent[Window].DataContext.OpenSmbiosGeneratorCommand}">
+                    <MenuItem.Icon>
+                        <ic:FluentIcon Icon="Desktop" IconSize="Size16" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator/>
+                <MenuItem Header="About" Command="{ReflectionBinding $parent[Window].DataContext.OpenAboutCommand}" >
+                    <MenuItem.Icon>
+                        <ic:FluentIcon Icon="QuestionCircle" IconSize="Size16" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Settings" Command="{ReflectionBinding $parent[Window].DataContext.OpenSettingsCommand}">
+                    <MenuItem.Icon>
+                        <ic:FluentIcon Icon="Settings" IconSize="Size16" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator/>
+                <MenuItem Header="Exit" Command="{ReflectionBinding $parent[Window].DataContext.ExitCommand}">
+                    <MenuItem.Icon>
+                        <ic:FluentIcon Icon="ArrowExit" IconSize="Size16" />
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuFlyout>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
