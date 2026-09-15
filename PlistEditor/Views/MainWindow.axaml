@@ -191,7 +191,43 @@
                 <Style Selector="TabItem /template/ ContentPresenter#PART_ContentPresenter">
                     <Setter Property="HorizontalAlignment" Value="Stretch" />
                 </Style>
+                <!-- Target the internal ItemsPresenter to handle vertical scrolling -->
+                <Style Selector="TabControl /template/ ItemsPresenter#PART_ItemsPresenter">
+                    <Setter Property="ItemsPanel">
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Vertical" />
+                        </ItemsPanelTemplate>
+                    </Setter>
+                </Style>
             </TabControl.Styles>
+            <!-- Wrap the tab list in a ScrollViewer -->
+            <TabControl.Template>
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{TemplateBinding CornerRadius}">
+                        <Grid ColumnDefinitions="Auto,*">
+                            <!-- Left Tab Strip with Vertical ScrollViewer -->
+                            <ScrollViewer Grid.Column="0"
+                                          VerticalScrollBarVisibility="Auto"
+                                          HorizontalScrollBarVisibility="Disabled">
+                                <ItemsPresenter Name="PART_ItemsPresenter"
+                                                ItemsPanel="{TemplateBinding ItemsPanel}" />
+                            </ScrollViewer>
+
+                            <!-- Selected Tab Content -->
+                            <ContentPresenter Grid.Column="1"
+                                              Name="PART_SelectedContentHost"
+                                              Margin="{TemplateBinding Padding}"
+                                              HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                              Content="{TemplateBinding SelectedContent}"
+                                              ContentTemplate="{TemplateBinding SelectedContentTemplate}" />
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </TabControl.Template>
         </TabControl>
     </DockPanel>
 </Window>
