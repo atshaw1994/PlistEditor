@@ -40,6 +40,31 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty] public partial SmbiosViewModel Smbios { get; set; } = new();
 
     [RelayCommand]
+    public async Task CreatePlistAsync()
+    {
+        // 1. Reset state
+        FirstLevel.Clear();
+        PlistFilePath = "Untitled.plist";
+
+        // 2. Add an initial default section
+        var defaultSection = new PlistSectionViewModel
+        {
+            Name = "NewSection",
+            ParentCollection = FirstLevel
+        };
+        FirstLevel.Add(defaultSection);
+
+        // 3. Set default selection and attach change tracking
+        SelectedSection = defaultSection;
+        defaultSection.AttachChangeTracker(MarkDirty);
+
+        // 4. Mark initial clean state
+        IsDirty = true;
+
+        await Task.CompletedTask;
+    }
+
+    [RelayCommand]
     public async Task OpenPlistAsync()
     {
         if (OpenFilePickerAsync == null) return;
